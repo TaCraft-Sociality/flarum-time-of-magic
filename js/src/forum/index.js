@@ -62,7 +62,10 @@ function initUserSettings() {
         <Switch
           state={!!(app.session.user && app.session.user.preferences()?.disableEffects)}
           onchange={(value) => {
-            app.session.user.savePreferences({ disableEffects: value }).then(() => m.redraw());
+            app.session.user.savePreferences({ disableEffects: value }).then(() => {
+              syncDynamicEffects();
+              m.redraw();
+            });
           }}
         >
           {app.translator.trans(PREFIX + '.forum.disable_effects_label')}
@@ -82,6 +85,10 @@ function removeLayer(kind) {
     activeLayers[kind].parentNode.removeChild(activeLayers[kind]);
   }
   delete activeLayers[kind];
+}
+
+function removeAllLayers() {
+  Object.keys(activeLayers).forEach((kind) => removeLayer(kind));
 }
 
 function initFallingEffect(kind) {
@@ -136,7 +143,10 @@ function initAmbientWithTracking(kind) {
 }
 
 function syncDynamicEffects() {
-  if (effectsDisabled()) return;
+  if (effectsDisabled()) {
+    removeAllLayers();
+    return;
+  }
 
   Object.keys(FALLING_EFFECTS).forEach((kind) => {
     const active = isEffectActive(kind);
@@ -168,7 +178,12 @@ function syncDynamicEffects() {
   });
 }
 
-app.initializers.add(PREFIX, () => {
+let booted = false;
+
+function bootEffects() {
+  if (booted) return;
+  booted = true;
+
   initUserSettings();
 
   if (effectsDisabled()) return;
@@ -187,7 +202,7 @@ app.initializers.add(PREFIX, () => {
     }
   });
 
-  setInterval(syncDynamicEffects, 60000);
+  setInterval(syncDynamicEffects, 15000);
 
   if (window.matchMedia) {
     try {
@@ -196,4 +211,48 @@ app.initializers.add(PREFIX, () => {
       // ignore
     }
   }
+}
+
+function forumReady() {
+  return typeof app !== 'undefined'
+    && app.forum
+    && typeof app.forum.attribute === 'function'
+    && app.forum.attribute('timeOfMagicSchedules') !== undefined;
+}
+
+function themeReady() {
+  if (typeof document === 'undefined') return true;
+  const html = document.documentElement;
+  if (html.classList.contains('cc--darkmode')) return true;
+  if (html.classList.contains('dark') || html.classList.contains('dark-mode') || html.classList.contains('theme-dark')) return true;
+  if (html.getAttribute('data-theme') === 'dark') return true;
+  return false;
+}
+
+function tryBoot() {
+  if (!forumReady()) return false;
+
+  if (!themeReady()) return false;
+
+  bootEffects();
+  return true;
+}
+
+app.initializers.add(PREFIX, () => {
+  if (tryBoot()) return;
+
+  let tries = 0;
+  const timer = setInterval(() => {
+    tries++;
+
+    if (tryBoot()) {
+      clearInterval(timer);
+      return;
+    }
+
+    if (tries > 200) {
+      clearInterval(timer);
+      if (forumReady()) bootEffects();
+    }
+  }, 50);
 });

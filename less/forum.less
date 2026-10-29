@@ -1,408 +1,279 @@
-.TimeOfMagicSettings {
-  background: var(--control-bg);
-  padding: 20px;
-  border-radius: var(--border-radius);
-  box-shadow: 0 2px 4px var(--shadow-color);
-  margin: 0 auto;
-
-  .Form-group {
-    margin: 0;
+.timeofmagic-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
   }
-
-  .FormControl {
-    max-width: 400px;
+  
+  .timeofmagic-particle {
+    position: fixed;
+    user-select: none;
+    pointer-events: none;
   }
-
-  &-section {
-    background: var(--body-bg);
-    border-radius: var(--border-radius);
-    box-shadow: 0 1px 3px var(--shadow-color);
-    padding: 20px;
-    margin-bottom: 20px;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    h3 {
-      margin: 0 0 14px;
-      color: var(--primary-color);
-      font-size: 15px;
-      font-weight: 700;
-    }
+  
+  @keyframes timeofmagic-snow-fall {
+    0% { top: -10%; }
+    100% { top: 100%; }
   }
-
-  &-sectionBody {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+  
+  @keyframes timeofmagic-snow-shake {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(60px); }
+    100% { transform: translateX(0); }
   }
-
-  .Form-controls {
-    margin-bottom: 20px;
+  
+  .timeofmagic-snowflake {
+    top: -10%;
+    color: #d0d8e0;
+    font-size: 1em;
+    font-family: Arial, sans-serif;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    animation-name: timeofmagic-snow-fall, timeofmagic-snow-shake;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: infinite, infinite;
   }
-
-  .Form-controls--section {
-   margin-bottom: 5px;
+  
+  @keyframes timeofmagic-leaf-fall {
+    0% { top: -10%; }
+    100% { top: 100%; }
   }
-
-  &-interfaceRow {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  
+  @keyframes timeofmagic-leaf-sway {
+    0% { transform: translateX(0) rotate(0deg); }
+    25% { transform: translateX(40px) rotate(90deg); }
+    50% { transform: translateX(-20px) rotate(180deg); }
+    75% { transform: translateX(30px) rotate(270deg); }
+    100% { transform: translateX(0) rotate(360deg); }
   }
-
-  &-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
+  
+  .timeofmagic-leaf {
+    top: -10%;
+    animation-name: timeofmagic-leaf-fall, timeofmagic-leaf-sway;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: infinite, infinite;
   }
-
-  &-effectRow {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--control-bg);
-
-    &:last-child {
-      border-bottom: none;
-    }
+  
+  @keyframes timeofmagic-rain-fall {
+    0% { top: -5%; }
+    100% { top: 100%; }
   }
-
-  &-densitySelect {
-    width: auto;
-    min-width: 130px;
-    margin: 0;
+  
+  .timeofmagic-raindrop {
+    top: -5%;
+    width: 1px;
+    background: var(--button-color);
+    opacity: 0.5;
+    animation-name: timeofmagic-rain-fall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
   }
-
-  &-customEffects {
-    margin-top: 8px;
-    padding-top: 16px;
-    border-top: 1px solid var(--control-bg);
+  
+  @keyframes timeofmagic-petal-fall {
+    0% { top: -10%; }
+    100% { top: 100%; }
   }
-
-  &-customEffectsHeader {
-    margin-bottom: 12px;
-
-    h4 {
-      margin: 0 0 4px;
-      color: var(--heading-color);
-    }
-
-    .helpText {
-      margin: 0;
-    }
+  
+  @keyframes timeofmagic-petal-sway {
+    0% { transform: translateX(0) rotate(0deg); }
+    25% { transform: translateX(60px) rotate(20deg); }
+    50% { transform: translateX(-30px) rotate(-10deg); }
+    75% { transform: translateX(45px) rotate(15deg); }
+    100% { transform: translateX(0) rotate(0deg); }
   }
-
-  &-customEffectRow {
-    margin-bottom: 12px;
-    padding: 12px 14px;
-    background: var(--body-bg);
-    border: 1px solid var(--control-bg);
-    border-radius: var(--border-radius);
+  
+  .timeofmagic-petal {
+    top: -10%;
+    animation-name: timeofmagic-petal-fall, timeofmagic-petal-sway;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: infinite, infinite;
   }
-
-  &-customEffectHeader {
-    .Form-group {
-      margin: 0;
-    }
-
-    .helpText {
-      margin: 2px 0 0;
-      color: var(--muted-color);
-      font-size: 12px;
-    }
+  
+  @keyframes timeofmagic-confetti-fall {
+    0% { top: -10%; }
+    100% { top: 100%; }
   }
-
-  &-customEffectFields {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 12px;
+  
+  @keyframes timeofmagic-confetti-spin {
+    0% { transform: translateX(0) rotate(0deg); }
+    25% { transform: translateX(30px) rotate(180deg); }
+    50% { transform: translateX(-25px) rotate(360deg); }
+    75% { transform: translateX(20px) rotate(540deg); }
+    100% { transform: translateX(0) rotate(720deg); }
   }
-
-  &-customField {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-
-    label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--heading-color);
-    }
-
-    .helpText {
-      margin: 0;
-      color: var(--muted-color);
-      font-size: 12px;
-    }
-
-    .FormControl {
-      max-width: 100%;
-    }
-
-    &--count {
-      flex: 0 0 140px;
-    }
+  
+  .timeofmagic-confetti {
+    top: -10%;
+    animation-name: timeofmagic-confetti-fall, timeofmagic-confetti-spin;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: infinite, infinite;
   }
-
-  &-emojiLink {
-    font-size: 12px;
+  
+  @keyframes timeofmagic-heart-rise {
+    0% { top: 110%; }
+    100% { top: -10%; }
   }
-
-  &-schedulerHeader {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+  
+  @keyframes timeofmagic-heart-float {
+    0% { transform: translateX(0) scale(0.9); }
+    25% { transform: translateX(-40px) scale(1); }
+    50% { transform: translateX(30px) scale(0.95); }
+    75% { transform: translateX(-25px) scale(1.05); }
+    100% { transform: translateX(0) scale(1); }
   }
-
-  &-schedulerHeader .helpText {
-    margin: 0;
+  
+  .timeofmagic-heart {
+    top: 110%;
+    animation-name: timeofmagic-heart-rise, timeofmagic-heart-float;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: infinite, infinite;
   }
-
-  &-CardList {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  
+  @keyframes timeofmagic-clover-fall {
+    0% { top: -10%; }
+    100% { top: 100%; }
   }
-
-  &-schedulerEmpty {
-    padding: 24px;
-    text-align: center;
-    color: var(--muted-color);
-    border: 1px dashed var(--control-bg);
-    border-radius: var(--border-radius);
-    font-size: 13px;
+  
+  @keyframes timeofmagic-clover-spin {
+    0% { transform: rotate(0deg) translateX(0); }
+    25% { transform: rotate(120deg) translateX(20px); }
+    50% { transform: rotate(240deg) translateX(-15px); }
+    75% { transform: rotate(360deg) translateX(15px); }
+    100% { transform: rotate(480deg) translateX(0); }
   }
-
-  &-scheduleCard {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px 20px;
-    padding: 12px 16px;
-    background: var(--body-bg);
-    border: 1px solid var(--control-bg);
-    border-radius: var(--border-radius);
-    box-shadow: 0 1px 3px var(--shadow-color);
-    transition: all 180ms;
-
-    &:hover {
-      box-shadow: 0 2px 8px var(--shadow-color);
-      transform: translateY(-1px);
-      border-color: var(--primary-color);
-    }
-
-    &.is-inactive {
-      opacity: 0.65;
-    }
+  
+  .timeofmagic-clover {
+    top: -10%;
+    animation-name: timeofmagic-clover-fall, timeofmagic-clover-spin;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: infinite, infinite;
   }
-
-  &-scheduleInfo {
-    flex: 0 1 0;
-    min-width: 180px;
+  
+  @keyframes timeofmagic-egg-fall {
+    0% { top: -10%; }
+    100% { top: 100%; }
   }
-
-  &-scheduleHeader {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
+  
+  @keyframes timeofmagic-egg-jiggle {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    25% { transform: translateX(15px) rotate(10deg); }
+    75% { transform: translateX(-15px) rotate(-10deg); }
   }
-
-  &-scheduleTitle {
-    font-weight: 600;
-    color: var(--heading-color);
+  
+  .timeofmagic-egg {
+    top: -10%;
+    animation-name: timeofmagic-egg-fall, timeofmagic-egg-jiggle;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: infinite, infinite;
   }
-
-  &-scheduleDates {
-    margin-top: 4px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+  
+  @keyframes timeofmagic-lantern-fall {
+    0% { top: -10%; }
+    100% { top: 100%; }
   }
-
-  &-scheduleDate {
-    color: var(--muted-color);
-    font-size: 12px;
+  
+  @keyframes timeofmagic-lantern-sway {
+    0% { transform: translateX(0) rotate(0deg); }
+    25% { transform: translateX(50px) rotate(8deg); }
+    50% { transform: translateX(-35px) rotate(-6deg); }
+    75% { transform: translateX(40px) rotate(5deg); }
+    100% { transform: translateX(0) rotate(0deg); }
   }
-
-  &-schedulePills {
-    flex: 1 1 0;
-    min-width: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+  
+  .timeofmagic-lantern {
+    top: -10%;
+    animation-name: timeofmagic-lantern-fall, timeofmagic-lantern-sway;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: infinite, infinite;
   }
-
-  &-schedulePill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--control-bg);
-    color: var(--text-color);
-    border-radius: 999px;
-    padding: 3px 10px;
-    font-size: 12px;
+  
+  @keyframes timeofmagic-firefly-rise {
+    0% { top: 110%; }
+    100% { top: -10%; }
   }
-
-  &-schedulePill-density {
-    color: var(--muted-color);
-    font-size: 11px;
-
-    &::before {
-      content: "\00B7";
-      margin-right: 6px;
-    }
+  
+  @keyframes timeofmagic-firefly-drift {
+    0% { transform: translateX(0) scale(1); }
+    25% { transform: translateX(35px) scale(1.2); }
+    50% { transform: translateX(-25px) scale(0.9); }
+    75% { transform: translateX(30px) scale(1.1); }
+    100% { transform: translateX(0) scale(1); }
   }
-
-  &-schedulePill--none {
-    color: var(--muted-color);
-    font-style: italic;
+  
+  .timeofmagic-firefly {
+    top: 110%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ffec8a;
+    box-shadow:
+      0 0 6px 2px rgba(255, 236, 138, 0.8),
+      0 0 18px 6px rgba(255, 224, 90, 0.35);
+    animation-name: timeofmagic-firefly-rise, timeofmagic-firefly-drift;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: infinite, infinite;
   }
-
-  &-scheduleActions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
+  
+  @keyframes timeofmagic-custom-rise {
+    0% { top: 110%; }
+    100% { top: -10%; }
   }
-
-  &-scheduleStatus {
-    font-size: 11px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    padding: 3px 10px;
-    border-radius: 4px;
-
-    &.active {
-      background: color-mix(in srgb, var(--primary-color) 15%, transparent);
-      color: var(--primary-color);
-    }
-
-    &.inactive {
-      background: var(--control-bg);
-      color: var(--muted-color);
-    }
+  
+  @keyframes timeofmagic-custom-fall {
+    0% { top: -10%; }
+    100% { top: 100%; }
   }
-}
-
-@media (min-width: 768px) {
-  .TimeOfMagicSettings-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 40px;
+  
+  @keyframes timeofmagic-custom-sway {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(25px); }
+    50% { transform: translateX(-15px); }
+    75% { transform: translateX(20px); }
+    100% { transform: translateX(0); }
   }
-
-  .TimeOfMagicSettings-customEffectFields {
-    flex-direction: row;
-    align-items: flex-end;
-    gap: 16px;
+  
+  .timeofmagic-custom-up {
+    top: 110%;
+    animation-name: timeofmagic-custom-rise, timeofmagic-custom-sway;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: infinite, infinite;
   }
-
-  .TimeOfMagicSettings-customField {
-    flex: 1 1 0;
+  
+  .timeofmagic-custom-down {
+    top: -10%;
+    animation-name: timeofmagic-custom-fall, timeofmagic-custom-sway;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: infinite, infinite;
   }
-}
-
-@media (min-width: 768px) {
-  .TimeOfMagicSettings-effectRow:nth-last-child(-n + 2) {
-    border-bottom: none;
+  
+  .timeofmagic-star {
+    position: absolute;
+    background: #8a8f98;
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(138, 143, 152, 0.9);
+    animation-name: timeofmagic-star-twinkle;
+    animation-iteration-count: infinite;
   }
-}
-
-@media (max-width: 767.98px) {
-  .TimeOfMagicSettings-scheduleCard {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-
-    &:hover {
-      transform: none;
-    }
+  
+  @keyframes timeofmagic-star-twinkle {
+    0%, 100% { opacity: 0.15; }
+    50% { opacity: 1; }
   }
-
-  .TimeOfMagicSettings-schedulerHeader {
-    flex-wrap: wrap;
+  
+  .timeofmagic-fog-blob {
+    position: absolute;
+    width: 45vw;
+    height: 30vh;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(160, 160, 160, 0.16) 0%, transparent 70%);
+    filter: blur(30px);
+    animation: timeofmagic-fog-drift 40s ease-in-out infinite alternate;
   }
-
-  .TimeOfMagicSettings-scheduleInfo {
-    min-width: 0;
+  
+  @keyframes timeofmagic-fog-drift {
+    0% { transform: translateX(-10vw); }
+    100% { transform: translateX(60vw); }
   }
-
-  .TimeOfMagicSettings-schedulePills {
-    justify-content: space-evenly;
-    min-width: 0;
-  }
-
-  .TimeOfMagicSettings-scheduleActions {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-    padding-top: 10px;
-    border-top: 1px solid var(--control-bg);
-  }
-}
-
-.TimeOfMagicModal {
-  .Modal-content {
-    max-width: 800px;
-  }
-}
-
-.TimeOfMagicModal-row {
-  display: grid;
-  gap: 0 16px;
-}
-
-.TimeOfMagicModal-effects {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 8px;
-  margin-top: 4px;
-}
-
-@media (min-width: 768px) {
-  .TimeOfMagicModal-row {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .TimeOfMagicModal-effects {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.TimeOfMagicModal-effect {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 8px 10px;
-  border: 1px solid var(--control-bg);
-  border-radius: 6px;
-
-  .Checkbox {
-    flex: 1;
-    min-width: 0;
-    margin: 0;
-  }
-}
-
-.TimeOfMagicModal-density {
-  width: auto;
-  min-width: 120px;
-  margin: 0;
-
-  &.is-disabled {
-    opacity: 0.4;
-  }
-}
-
-.TimeOfMagicModal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}

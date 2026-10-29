@@ -46,13 +46,34 @@ export function normalizeEffects(schedule) {
 }
 
 export function isDarkTheme() {
-  if (typeof document !== 'undefined' && document.documentElement.classList.contains('dark')) {
-    return true;
+  if (typeof document !== 'undefined') {
+    const html = document.documentElement;
+    const body = document.body;
+
+    if (
+      html.classList.contains('cc--darkmode') ||
+      html.classList.contains('dark') ||
+      html.classList.contains('dark-mode') ||
+      html.classList.contains('theme-dark') ||
+      (body && (
+        body.classList.contains('dark') ||
+        body.classList.contains('dark-mode') ||
+        body.classList.contains('theme-dark')
+      )) ||
+      html.getAttribute('data-theme') === 'dark' ||
+      (body && body.getAttribute('data-theme') === 'dark')
+    ) {
+      return true;
+    }
   }
 
   if (typeof app !== 'undefined' && app.session && app.session.user) {
-    const pref = app.session.user.preferences && app.session.user.preferences().darkMode;
-    if (pref !== undefined && pref !== null) return !!pref;
+    const prefs = app.session.user.preferences && app.session.user.preferences();
+    if (prefs) {
+      if (prefs.darkMode !== undefined && prefs.darkMode !== null) return !!prefs.darkMode;
+      if (prefs.theme !== undefined && prefs.theme !== null) return prefs.theme === 'dark';
+      if (prefs.colorScheme !== undefined && prefs.colorScheme !== null) return prefs.colorScheme === 'dark';
+    }
   }
 
   if (typeof window !== 'undefined' && window.matchMedia) {

@@ -3,7 +3,6 @@ import Switch from 'flarum/common/components/Switch';
 import { PREFIX, parseJsonArray, parseCustomConfig, isScheduleActive } from '../../common';
 import ScheduleModal from './ScheduleModal';
 import ConfirmModal from './ConfirmModal';
-import ColorField from './ColorField';
 
 const EFFECT_OPTIONS = [
   { value: 'snow', label: 'snow_label' },
@@ -44,123 +43,11 @@ export default class TimeOfMagicSettingsPage extends ExtensionPage {
   content() {
     return m('.ExtensionPage-settings', m('.container', [
       m('.TimeOfMagicSettings', [
-        ...this._interfaceSection(),
         this._effectsSection(),
         this._schedulerSection(),
-      m('.Form-group.Form-controls.Form-controls--section', this.submitButton()),
+        m('.Form-group.Form-controls.Form-controls--section', this.submitButton()),
       ]),
     ]));
-  }
-
-  _interfaceSection() {
-    return [
-      this._section('section_interface', [
-        this._interfaceRow(
-          PREFIX + '.progress_bar',
-          'admin.progress_bar_label',
-          'admin.progress_bar_description',
-          this.setting(PREFIX + '.progress_bar', '')() === '1' ? this._colorField(PREFIX + '.progress_bar_color', 'admin.progress_bar_color_label') : null
-        ),
-
-        this._interfaceRow(
-          PREFIX + '.back_to_top',
-          'admin.back_to_top_label',
-          'admin.back_to_top_description',
-          this.setting(PREFIX + '.back_to_top', '')() === '1'
-              ? m('.TimeOfMagicSettings-indent', [
-                  this._toggle(PREFIX + '.back_to_top_rounded', 'admin.back_to_top_shape_label', 'admin.back_to_top_shape_description'),
-                  this._iconField(),
-                  this._colorField(PREFIX + '.back_to_top_color', 'admin.back_to_top_color_label'),
-                  this._colorField(PREFIX + '.back_to_top_icon_color', 'admin.back_to_top_icon_color_label'),
-                ])
-            : null
-        ),
-
-        this._interfaceRow(
-          PREFIX + '.scrollbar',
-          'admin.scrollbar_label',
-          'admin.scrollbar_description',
-          this.setting(PREFIX + '.scrollbar', '')() === '1' ? this._colorField(PREFIX + '.scrollbar_color', 'admin.scrollbar_color_label') : null
-        ),
-
-        this._interfaceRow(PREFIX + '.swap_layout', 'admin.swap_layout_label', 'admin.swap_layout_description'),
-
-        this._interfaceRow(
-          PREFIX + '.click_spark',
-          'admin.click_spark_label',
-          'admin.click_spark_description',
-          this.setting(PREFIX + '.click_spark', '')() === '1' ? this._colorField(PREFIX + '.click_spark_color', 'admin.click_spark_color_label') : null
-        ),
-
-        this._interfaceRow(
-          PREFIX + '.cursor_trail',
-          'admin.cursor_trail_label',
-          'admin.cursor_trail_description',
-          this.setting(PREFIX + '.cursor_trail', '')() === '1'
-            ? this._itemListField(PREFIX + '.trail_items', 'admin.trail_items_label')
-            : null
-        ),
-
-        this._interfaceRow(
-          PREFIX + '.cursor_dust',
-          'admin.cursor_dust_label',
-          'admin.cursor_dust_description',
-          this.setting(PREFIX + '.cursor_dust', '')() === '1'
-            ? this._colorField(PREFIX + '.cursor_dust_color', 'admin.cursor_dust_color_label')
-            : null
-        ),
-
-        this._interfaceRow(PREFIX + '.cursor_flashlight', 'admin.cursor_flashlight_label', 'admin.cursor_flashlight_description'),
-
-        this._interfaceRow(
-          PREFIX + '.click_burst',
-          'admin.click_burst_label',
-          'admin.click_burst_description',
-          this.setting(PREFIX + '.click_burst', '')() === '1'
-            ? this._itemListField(PREFIX + '.click_burst_items', 'admin.click_burst_items_label')
-            : null
-        ),
-
-        this._backgroundField(),
-
-        this._interfaceRow(PREFIX + '.bg_parallax', 'admin.bg_parallax_label', 'admin.bg_parallax_description'),
-
-        this._interfaceRow(
-          PREFIX + '.site_tint',
-          'admin.site_tint_label',
-          'admin.site_tint_description',
-          this.setting(PREFIX + '.site_tint', '')() === '1'
-            ? this._colorField(PREFIX + '.site_tint_color', 'admin.site_tint_color_label')
-            : null
-        ),
-      ]),
-      m('.Form-group.Form-controls', this.submitButton()),
-    ];
-  }
-
-  _interfaceRow(key, labelKey, descKey, extra) {
-    return m('.TimeOfMagicSettings-interfaceRow', [
-      this._toggle(key, labelKey, descKey),
-      extra || null,
-    ]);
-  }
-
-  _backgroundField() {
-    return m('.Form-group.TimeOfMagicSettings-interfaceRow', [
-      m('label', app.translator.trans(PREFIX + '.admin.background_label')),
-      m('select.FormControl', {
-        value: this.setting(PREFIX + '.background', '')(),
-        onchange: (e) => this.setting(PREFIX + '.background')(e.target.value),
-      }, [
-        m('option', { value: '' }, app.translator.trans(PREFIX + '.admin.background_none')),
-        m('option', { value: 'dots' }, app.translator.trans(PREFIX + '.admin.background_dots')),
-        m('option', { value: 'grid' }, app.translator.trans(PREFIX + '.admin.background_grid')),
-        m('option', { value: 'diagonal' }, app.translator.trans(PREFIX + '.admin.background_diagonal')),
-        m('option', { value: 'waves' }, app.translator.trans(PREFIX + '.admin.background_waves')),
-        m('option', { value: 'hexagon' }, app.translator.trans(PREFIX + '.admin.background_hexagon')),
-      ]),
-      m('p.helpText', app.translator.trans(PREFIX + '.admin.background_description')),
-    ]);
   }
 
   _effectsSection() {
@@ -177,17 +64,6 @@ export default class TimeOfMagicSettingsPage extends ExtensionPage {
         this._customEffectRow('up', this.customUp, 'custom_up_label', 'custom_up_description'),
         this._customEffectRow('down', this.customDown, 'custom_down_label', 'custom_down_description'),
       ),
-    ]);
-  }
-
-  _itemListField(key, labelKey) {
-    return m('.Form-group', [
-      m('label', app.translator.trans(PREFIX + '.' + labelKey)),
-      m('input.FormControl', {
-        type: 'text',
-        value: this.setting(key, '')(),
-        oninput: (e) => this.setting(key)(e.target.value),
-      }),
     ]);
   }
 
@@ -219,10 +95,10 @@ export default class TimeOfMagicSettingsPage extends ExtensionPage {
           m('.TimeOfMagicSettings-scheduleTitle',
             schedule.label || app.translator.trans(PREFIX + '.admin.scheduler_untitled')
           ),
+          this._themePill(schedule.theme),
         ]),
         m('.TimeOfMagicSettings-scheduleDates', [
-          m('span.TimeOfMagicSettings-scheduleDate', this._formatDate(schedule.start)),
-          m('span.TimeOfMagicSettings-scheduleDate', this._formatDate(schedule.end)),
+          this._formatScheduleDates(schedule),
         ]),
       ]),
 
@@ -251,6 +127,13 @@ export default class TimeOfMagicSettingsPage extends ExtensionPage {
         }, m('i.fas.fa-trash-alt')),
       ]),
     ]);
+  }
+
+  _themePill(theme) {
+    if (!theme || theme === 'any') return null;
+    return m('span.TimeOfMagicSettings-schedulePill',
+      app.translator.trans(PREFIX + '.admin.' + (theme === 'dark' ? 'scheduler_theme_dark' : 'scheduler_theme_light'))
+    );
   }
 
   _effectRow(effect) {
@@ -328,18 +211,6 @@ export default class TimeOfMagicSettingsPage extends ExtensionPage {
     ]);
   }
 
-  _iconField() {
-    return m('.Form-group', [
-      m('label', app.translator.trans(PREFIX + '.admin.back_to_top_icon_label')),
-      m('input.FormControl', {
-        type: 'text',
-        value: this.setting(PREFIX + '.back_to_top_icon', 'fa-solid fa-arrow-up')(),
-        oninput: (e) => this.setting(PREFIX + '.back_to_top_icon')(e.target.value),
-        placeholder: 'fa-solid fa-arrow-up',
-      }),
-    ]);
-  }
-
   _densityOptions() {
     return [
       m('option', { value: 'light' }, app.translator.trans(PREFIX + '.admin.density_light')),
@@ -391,16 +262,6 @@ export default class TimeOfMagicSettingsPage extends ExtensionPage {
       ),
       m('p.helpText', app.translator.trans(PREFIX + '.' + descKey)),
     ]);
-  }
-
-  _colorField(key, labelKey) {
-    return m(ColorField, {
-      page: this,
-      settingKey: key,
-      labelKey,
-      placeholderKey: 'admin.color_placeholder',
-      helpKey: 'admin.color_description',
-    });
   }
 
   _openModal(schedule) {
@@ -460,6 +321,24 @@ export default class TimeOfMagicSettingsPage extends ExtensionPage {
         m.redraw();
       },
     });
+  }
+
+  _formatScheduleDates(schedule) {
+    if (schedule.mode === 'daily') {
+      return [
+        m('span.TimeOfMagicSettings-scheduleDate',
+          app.translator.trans(PREFIX + '.admin.scheduler_daily_prefix', {
+            start: schedule.startTime || '00:00',
+            end: schedule.endTime || '23:59',
+          })
+        ),
+      ];
+    }
+
+    return [
+      m('span.TimeOfMagicSettings-scheduleDate', this._formatDate(schedule.start)),
+      m('span.TimeOfMagicSettings-scheduleDate', this._formatDate(schedule.end)),
+    ];
   }
 
   _formatDate(dt) {

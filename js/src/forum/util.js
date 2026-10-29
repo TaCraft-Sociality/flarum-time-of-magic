@@ -32,9 +32,3 @@ export function userPreference(name) {
     ? userResource.attributes.preferences[name]
     : undefined;
 }
-
-export function isInteractiveClick(e) {
-  return !!e.target.closest(
-    'a, button, input, textarea, select, label, [role="button"], .Button, .item-copyLink, .Composer'
-  );
-}

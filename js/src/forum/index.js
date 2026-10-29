@@ -4,19 +4,8 @@ import Switch from 'flarum/common/components/Switch';
 import FieldSet from 'flarum/common/components/FieldSet';
 import { PREFIX, capitalize, parseJsonArray, parseCustomConfig, normalizeEffects, isScheduleActive } from '../common';
 import { FALLING_EFFECTS, createParticleLayer, renderParticles } from './fallingEffects';
-import { forumAttribute, userPreference, isInteractiveClick } from './util';
-import { initCursorTrail, initCursorDust, initCursorFlashlight, initClickBurst } from './cursorEffects';
-import { initAmbientEffect, initBackgroundParallax, initSiteTint } from './ambientEffects';
-
-
-const CSS_VARIABLES = {
-  progressBar: '--timeofmagic-accent-bar',
-  backToTop: '--timeofmagic-accent-top',
-  backToTopIcon: '--timeofmagic-accent-top-icon',
-  cursorDust: '--timeofmagic-accent-dust',
-  scrollbar: '--timeofmagic-accent-scrollbar',
-  clickSpark: '--timeofmagic-accent-spark',
-};
+import { forumAttribute, userPreference } from './util';
+import { initAmbientEffect } from './ambientEffects';
 
 function effectsDisabled() {
   return !!userPreference('disableEffects');
@@ -86,122 +75,34 @@ function initUserSettings() {
   });
 }
 
-function applyMagicColors() {
-  Object.entries({
-    progressBar: forumAttribute('timeOfMagicProgressBarColor'),
-    backToTop: forumAttribute('timeOfMagicBackToTopColor'),
-    backToTopIcon: forumAttribute('timeOfMagicBackToTopIconColor'),
-    cursorDust: forumAttribute('timeOfMagicCursorDustColor'),
-    scrollbar: forumAttribute('timeOfMagicScrollbarColor'),
-    clickSpark: forumAttribute('timeOfMagicClickSparkColor'),
-  }).forEach(([key, color]) => {
-    if (color) {
-      document.documentElement.style.setProperty(CSS_VARIABLES[key], color);
-    }
-  });
-}
+const activeLayers = {};
 
-function onScrollFrame(callback) {
-  let ticking = false;
-
-  window.addEventListener('scroll', () => {
-    if (!ticking) {
-      requestAnimationFrame(() => {
-        callback();
-        ticking = false;
-      });
-      ticking = true;
-    }
-  });
-}
-
-function initProgressBar() {
-  const bar = document.createElement('div');
-  bar.id = 'scroll-progress-bar';
-  document.body.appendChild(bar);
-
-  onScrollFrame(() => {
-    const scrollTop = document.documentElement.scrollTop;
-    const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-    bar.style.width = scrollHeight > 0 ? `${(scrollTop / scrollHeight) * 100}%` : '0%';
-  });
-}
-
-function initBackToTop() {
-  const rounded = !!forumAttribute('timeOfMagicBackToTopRounded');
-  const iconClass = forumAttribute('timeOfMagicBackToTopIcon') || 'fa-solid fa-arrow-up';
-
-  const btn = document.createElement('div');
-  btn.id = 'back-to-top';
-  btn.classList.add(rounded ? 'back-to-top--rounded' : 'back-to-top--circle');
-
-  const iconEl = document.createElement('i');
-  iconEl.className = iconClass;
-  btn.appendChild(iconEl);
-
-  document.body.appendChild(btn);
-
-  onScrollFrame(() => {
-    btn.classList.toggle('visible', window.scrollY > 300);
-  });
-
-  btn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-}
-
-function initScrollbar() {
-  if (forumAttribute('timeOfMagicScrollbar')) {
-    document.documentElement.classList.add('timeofmagic-custom-scrollbar');
+function removeLayer(kind) {
+  if (activeLayers[kind] && activeLayers[kind].parentNode) {
+    activeLayers[kind].parentNode.removeChild(activeLayers[kind]);
   }
-}
-
-function initSwapLayout() {
-  if (forumAttribute('timeOfMagicSwapLayout')) {
-    document.documentElement.classList.add('timeofmagic-swap-layout');
-  }
-}
-
-function initBackground() {
-  const VALID_PATTERNS = ['dots', 'grid', 'diagonal', 'waves', 'hexagon'];
-  const bgPattern = forumAttribute('timeOfMagicBackground') || '';
-
-  if (bgPattern && VALID_PATTERNS.includes(bgPattern)) {
-    document.body.classList.add(`timeofmagic-bg-${bgPattern}`);
-  }
-}
-
-function initClickSpark() {
-  document.addEventListener('click', (e) => {
-    if (isInteractiveClick(e)) return;
-
-    const spark = document.createElement('div');
-    spark.className = 'timeofmagic-spark';
-    spark.style.left = `${e.clientX}px`;
-    spark.style.top = `${e.clientY}px`;
-    document.body.appendChild(spark);
-
-    setTimeout(() => {
-      if (spark.parentNode) {
-        spark.parentNode.removeChild(spark);
-      }
-    }, 700);
-  });
+  delete activeLayers[kind];
 }
 
 function initFallingEffect(kind) {
   const cfg = FALLING_EFFECTS[kind];
   const count = cfg.counts[effectDensity(kind)] || cfg.counts.medium;
 
-  renderParticles(createParticleLayer(cfg.containerId), cfg, count);
+  removeLayer(kind);
+  activeLayers[kind] = createParticleLayer(cfg.containerId);
+  renderParticles(activeLayers[kind], cfg, count);
 }
 
 function initCustomEffect(slot) {
   const cfg = getCustomConfig(slot);
   if (!cfg.items.length) return;
 
+  const key = 'custom_' + slot;
+
+  removeLayer(key);
+  activeLayers[key] = createParticleLayer('timeofmagic-custom-' + slot);
   renderParticles(
-    createParticleLayer('timeofmagic-custom-' + slot),
+    activeLayers[key],
     {
       className: slot === 'up' ? 'timeofmagic-custom-up' : 'timeofmagic-custom-down',
       items: cfg.items,
@@ -217,22 +118,58 @@ function initCustomEffect(slot) {
   );
 }
 
-app.initializers.add(PREFIX, () => {
-  applyMagicColors();
-  initUserSettings();
-  initScrollbar();
-  initSwapLayout();
-  initBackground();
-  if (forumAttribute('timeOfMagicBgParallax')) initBackgroundParallax();
-  if (forumAttribute('timeOfMagicSiteTint')) initSiteTint();
+function initAmbientWithTracking(kind) {
+  if (activeLayers[kind]) return;
 
-  if (forumAttribute('timeOfMagicProgressBar')) initProgressBar();
-  if (forumAttribute('timeOfMagicBackToTop')) initBackToTop();
-  if (forumAttribute('timeOfMagicClickSpark')) initClickSpark();
-  if (forumAttribute('timeOfMagicCursorTrail')) initCursorTrail();
-  if (forumAttribute('timeOfMagicCursorDust')) initCursorDust();
-  if (forumAttribute('timeOfMagicCursorFlashlight')) initCursorFlashlight();
-  if (forumAttribute('timeOfMagicClickBurst')) initClickBurst();
+  const before = document.body.children.length;
+  initAmbientEffect(kind);
+
+  const cls = 'timeofmagic-' + (kind === 'starfield' ? 'stars' : 'fog');
+
+  for (let i = document.body.children.length - 1; i >= before - 1 && i >= 0; i--) {
+    const node = document.body.children[i];
+    if (node && node.classList && node.classList.contains(cls)) {
+      activeLayers[kind] = node;
+      return;
+    }
+  }
+}
+
+function syncDynamicEffects() {
+  if (effectsDisabled()) return;
+
+  Object.keys(FALLING_EFFECTS).forEach((kind) => {
+    const active = isEffectActive(kind);
+    if (active && !activeLayers[kind]) {
+      initFallingEffect(kind);
+    } else if (!active && activeLayers[kind]) {
+      removeLayer(kind);
+    }
+  });
+
+  ['fog', 'starfield'].forEach((kind) => {
+    const active = isEffectActive(kind);
+    if (active && !activeLayers[kind]) {
+      initAmbientWithTracking(kind);
+    } else if (!active && activeLayers[kind]) {
+      removeLayer(kind);
+    }
+  });
+
+  ['up', 'down'].forEach((slot) => {
+    const key = 'custom_' + slot;
+    const active = getCustomConfig(slot).enabled || !!activeSchedule(key);
+
+    if (active && !activeLayers[key]) {
+      initCustomEffect(slot);
+    } else if (!active && activeLayers[key]) {
+      removeLayer(key);
+    }
+  });
+}
+
+app.initializers.add(PREFIX, () => {
+  initUserSettings();
 
   if (effectsDisabled()) return;
 
@@ -241,7 +178,7 @@ app.initializers.add(PREFIX, () => {
   });
 
   ['fog', 'starfield'].forEach((kind) => {
-    if (isEffectActive(kind)) initAmbientEffect(kind);
+    if (isEffectActive(kind)) initAmbientWithTracking(kind);
   });
 
   ['up', 'down'].forEach((slot) => {
@@ -249,4 +186,14 @@ app.initializers.add(PREFIX, () => {
       initCustomEffect(slot);
     }
   });
+
+  setInterval(syncDynamicEffects, 60000);
+
+  if (window.matchMedia) {
+    try {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncDynamicEffects);
+    } catch (e) {
+      // ignore
+    }
+  }
 });

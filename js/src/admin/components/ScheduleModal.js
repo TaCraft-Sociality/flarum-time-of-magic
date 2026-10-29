@@ -10,8 +10,12 @@ export default class ScheduleModal extends Modal {
     const schedule = this.attrs.schedule;
 
     this.label = schedule ? schedule.label || '' : '';
+    this.mode = schedule ? schedule.mode || 'dates' : 'dates';
+    this.theme = schedule ? schedule.theme || 'any' : 'any';
     this.start = schedule ? schedule.start || '' : '';
     this.end = schedule ? schedule.end || '' : '';
+    this.startTime = schedule ? schedule.startTime || '18:00' : '18:00';
+    this.endTime = schedule ? schedule.endTime || '06:00' : '06:00';
     this.enabled = schedule ? !!schedule.enabled : true;
     this.selectedEffects = (schedule ? schedule.effects : [])
       .map((effect) => {
@@ -52,28 +56,84 @@ export default class ScheduleModal extends Modal {
 
         m('.TimeOfMagicModal-row', [
           m('.Form-group', [
-            m('label', app.translator.trans(PREFIX + '.admin.scheduler_start_label')),
-            m('input.FormControl', {
-              type: 'datetime-local',
-              value: this.start,
-              oninput: (e) => {
-                this.start = e.target.value;
+            m('label', app.translator.trans(PREFIX + '.admin.scheduler_mode_label')),
+            m('select.FormControl', {
+              value: this.mode,
+              onchange: (e) => {
+                this.mode = e.target.value;
                 m.redraw();
               },
-            }),
+            }, [
+              m('option', { value: 'dates' }, app.translator.trans(PREFIX + '.admin.scheduler_mode_dates')),
+              m('option', { value: 'daily' }, app.translator.trans(PREFIX + '.admin.scheduler_mode_daily')),
+            ]),
           ]),
           m('.Form-group', [
-            m('label', app.translator.trans(PREFIX + '.admin.scheduler_end_label')),
-            m('input.FormControl', {
-              type: 'datetime-local',
-              value: this.end,
-              oninput: (e) => {
-                this.end = e.target.value;
+            m('label', app.translator.trans(PREFIX + '.admin.scheduler_theme_label')),
+            m('select.FormControl', {
+              value: this.theme,
+              onchange: (e) => {
+                this.theme = e.target.value;
                 m.redraw();
               },
-            }),
+            }, [
+              m('option', { value: 'any' }, app.translator.trans(PREFIX + '.admin.scheduler_theme_any')),
+              m('option', { value: 'light' }, app.translator.trans(PREFIX + '.admin.scheduler_theme_light')),
+              m('option', { value: 'dark' }, app.translator.trans(PREFIX + '.admin.scheduler_theme_dark')),
+            ]),
           ]),
         ]),
+
+        this.mode === 'dates'
+          ? m('.TimeOfMagicModal-row', [
+              m('.Form-group', [
+                m('label', app.translator.trans(PREFIX + '.admin.scheduler_start_label')),
+                m('input.FormControl', {
+                  type: 'datetime-local',
+                  value: this.start,
+                  oninput: (e) => {
+                    this.start = e.target.value;
+                    m.redraw();
+                  },
+                }),
+              ]),
+              m('.Form-group', [
+                m('label', app.translator.trans(PREFIX + '.admin.scheduler_end_label')),
+                m('input.FormControl', {
+                  type: 'datetime-local',
+                  value: this.end,
+                  oninput: (e) => {
+                    this.end = e.target.value;
+                    m.redraw();
+                  },
+                }),
+              ]),
+            ])
+          : m('.TimeOfMagicModal-row', [
+              m('.Form-group', [
+                m('label', app.translator.trans(PREFIX + '.admin.scheduler_start_time_label')),
+                m('input.FormControl', {
+                  type: 'time',
+                  value: this.startTime,
+                  oninput: (e) => {
+                    this.startTime = e.target.value;
+                    m.redraw();
+                  },
+                }),
+              ]),
+              m('.Form-group', [
+                m('label', app.translator.trans(PREFIX + '.admin.scheduler_end_time_label')),
+                m('input.FormControl', {
+                  type: 'time',
+                  value: this.endTime,
+                  oninput: (e) => {
+                    this.endTime = e.target.value;
+                    m.redraw();
+                  },
+                }),
+                m('p.helpText', app.translator.trans(PREFIX + '.admin.scheduler_end_time_help')),
+              ]),
+            ]),
 
         m('.Form-group', [
           m('label', app.translator.trans(PREFIX + '.admin.scheduler_effects_label')),
@@ -137,15 +197,21 @@ export default class ScheduleModal extends Modal {
   }
 
   _validationError() {
-    if (!this.start || !this.end) {
-      return 'scheduler_validation_dates_required';
-    }
+    if (this.mode === 'dates') {
+      if (!this.start || !this.end) {
+        return 'scheduler_validation_dates_required';
+      }
 
-    const start = new Date(this.start).getTime();
-    const end = new Date(this.end).getTime();
+      const start = new Date(this.start).getTime();
+      const end = new Date(this.end).getTime();
 
-    if (Number.isNaN(start) || Number.isNaN(end) || end <= start) {
-      return 'scheduler_validation_end_before_start';
+      if (Number.isNaN(start) || Number.isNaN(end) || end <= start) {
+        return 'scheduler_validation_end_before_start';
+      }
+    } else {
+      if (!this.startTime || !this.endTime) {
+        return 'scheduler_validation_times_required';
+      }
     }
 
     if (!this.selectedEffects.length) {
@@ -178,16 +244,26 @@ export default class ScheduleModal extends Modal {
 
     const existing = this.attrs.schedule;
 
-    this.attrs.save({
+    const data = {
       id: existing ? existing.id : Math.random().toString(36).slice(2, 10),
       label: this.label,
-      start: this.start,
-      end: this.end,
+      mode: this.mode,
+      theme: this.theme,
       enabled: this.enabled,
       effects: this.selectedEffects.map((effect) =>
         effect.density ? { name: effect.name, density: effect.density } : { name: effect.name }
       ),
-    });
+    };
+
+    if (this.mode === 'dates') {
+      data.start = this.start;
+      data.end = this.end;
+    } else {
+      data.startTime = this.startTime;
+      data.endTime = this.endTime;
+    }
+
+    this.attrs.save(data);
 
     this.hide();
   }

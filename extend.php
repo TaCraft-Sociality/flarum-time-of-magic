@@ -10,19 +10,7 @@ $attributeName = function (string $key): string {
 
 $boolKeys = [
     'allow_user_disable',
-    'progress_bar',
-    'back_to_top',
-    'back_to_top_rounded',
     'snow',
-    'scrollbar',
-    'swap_layout',
-    'click_spark',
-    'cursor_trail',
-    'cursor_dust',
-    'cursor_flashlight',
-    'click_burst',
-    'bg_parallax',
-    'site_tint',
 ];
 
 $effectKeys = [
@@ -42,30 +30,13 @@ $effectKeys = [
 
 $jsonKeys = ['schedules', 'custom_up', 'custom_down'];
 
-$plainKeys = [
-    'back_to_top_icon',
-    'background',
-    'progress_bar_color',
-    'back_to_top_color',
-    'back_to_top_icon_color',
-    'scrollbar_color',
-    'click_spark_color',
-    'cursor_dust_color',
-    'trail_items',
-    'click_burst_items',
-    'site_tint_color',
-];
+$plainKeys = [];
 
 $defaultMap = [
     'schedules' => '[]',
     'custom_up' => '[]',
     'custom_down' => '[]',
-    'back_to_top_icon' => 'fa-solid fa-arrow-up',
     'allow_user_disable' => true,
-    'trail_items' => '✦ ✨',
-    'click_burst_items' => '✨ 💥 ⭐',
-    'cursor_dust_color' => '',
-    'site_tint_color' => '',
 ];
 
 
